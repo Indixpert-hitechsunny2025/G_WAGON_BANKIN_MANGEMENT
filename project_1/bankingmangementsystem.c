@@ -14,9 +14,11 @@ void displayAccountDetails();
 int isValidName(char name[]);
 int isValidNumber(char input[]);
 float convertToFloat(char input[]);
+int validateTaskNumber(int task);
 
 int main() {
     int choice;
+    char input[50];
 
     while (1) {
         printf("\n***** Simple Banking System *****\n");
@@ -28,14 +30,18 @@ int main() {
         printf("0. Exit");
         printf("\n==============================\n");
         printf("Enter your choice:- ");
-        scanf("%d", &choice);
-        if(choice==0){
-            option(choice);
+        if (scanf("%d", &choice) != 1 || !validateTaskNumber(choice)) {
+            printf("\nInvalid input! Please enter a number between 0 and 5.\n");
+            while (getchar() != '\n');
+            continue;
+        }
+        if (choice == 0) {
+            printf("\nExiting Program. Goodbye!\n");
             break;
         }
-        getchar();
         option(choice);
     }
+    return 0;
 }
 
 int option(int choice){
@@ -61,6 +67,7 @@ int option(int choice){
         default:
             printf("\nInvalid Choice! Try Again.\n");
     }
+    return 1;
 }
 
 void createAccount() {
@@ -106,9 +113,9 @@ void depositAmount() {
     do {
         printf("\nEnter Amount to Deposit:- ");
         scanf("%s", input);
-        if (!isValidNumber(input) || (amount = convertToFloat(input)) < 0)
+        if (!isValidNumber(input) || (amount = convertToFloat(input)) < 100)
             printf("\nInvalid! Minimum deposit is 100.\n");
-    } while (!isValidNumber(input) || amount < 0);
+    } while (!isValidNumber(input) || amount < 100);
 
     balance += amount;
         printf("\n***** Deposit successful. *****\n");
@@ -129,15 +136,22 @@ void withdrawAmount() {
     do {
         printf("\nEnter Amount to Withdraw: ");
         scanf("%s", input);
-        if (!isValidNumber(input) || (amount = convertToFloat(input)) > (balance - 500))
+        if (!isValidNumber(input) || (amount = convertToFloat(input)) > (balance - 500)){
             printf("\nInvalid! Minimum balance 500 must be maintained.\n");
+            continue;
+        }
+        if (((int)amount) % 100 != 0) {
+            printf("\nError: Withdrawal amount must be a round figure\n");
+            amount = -1;
+        }
     } while (!isValidNumber(input) || amount > (balance - 500));
-
-    balance -= amount;
-    printf("\n***** Withdrawal successful! *****\n");
-    printf("\nAccount number:- %s\n", accountNumber);
-    printf("Your new balance is:- %.2f\n", balance);
-    printf("\n==============================\n");
+    if(amount > 0){
+        balance -= amount;
+        printf("\n***** Withdrawal successful! *****\n");
+        printf("\nAccount number:- %s\n", accountNumber);
+        printf("Your new balance is:- %.2f\n", balance);
+        printf("\n==============================\n");
+    }
 }
 
 void checkBalance() {
@@ -187,4 +201,8 @@ float convertToFloat(char input[]) {
         i++;
     }
     return result;
+}
+
+int validateTaskNumber(int task) {
+    return task >= 0 && task <= 5;
 }
