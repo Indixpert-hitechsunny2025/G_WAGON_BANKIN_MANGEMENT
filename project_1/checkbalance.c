@@ -13,6 +13,8 @@ void checkBalance();
 int isValidName(char name[]);
 int isValidNumber(char input[]);
 float convertToFloat(char input[]);
+int validateTaskNumber(int task);
+
 int main() {
     int choice;
 
@@ -25,14 +27,18 @@ int main() {
         printf("0. Exit");
         printf("\n==============================\n");
         printf("Enter your choice:- ");
-        scanf("%d", &choice);
-        if(choice==0){
-            option(choice);
+        if (scanf("%d", &choice) != 1 || !validateTaskNumber(choice)) {
+            printf("\nInvalid input! Please enter a number between 0 and 5.\n");
+            while (getchar() != '\n');
+            continue;
+        }
+        if (choice == 0) {
+            printf("\nExiting Program. Goodbye!\n");
             break;
         }
-        getchar();
         option(choice);
     }
+    return 0;
 }
 
 int option(int choice){
@@ -123,22 +129,28 @@ void withdrawAmount() {
     do {
         printf("\nEnter Amount to Withdraw: ");
         scanf("%s", input);
-        if (!isValidNumber(input) || (amount = convertToFloat(input)) > (balance - 500))
+        if (!isValidNumber(input) || (amount = convertToFloat(input)) > (balance - 500)){
             printf("\nInvalid! Minimum balance 500 must be maintained.\n");
+            continue;
+        }
+        if (((int)amount) % 100 != 0) {
+            printf("\nError: Withdrawal amount must be a round figure\n");
+            amount = -1;
+        }
     } while (!isValidNumber(input) || amount > (balance - 500));
-
-    balance -= amount;
-    printf("\n***** Withdrawal successful! *****\n");
-    printf("\nAccount number:- %s\n", accountNumber);
-    printf("Your new balance is:- %.2f\n", balance);
-    printf("\n==============================\n");
+    if(amount > 0){
+        balance -= amount;
+        printf("\n***** Withdrawal successful! *****\n");
+        printf("\nAccount number:- %s\n", accountNumber);
+        printf("Your new balance is:- %.2f\n", balance);
+        printf("\n==============================\n");
+    }
 }
 
 void checkBalance() {
     if (!accountCreated) {
         printf("Create an account first!\n");
     } else {
-        // printf("Total Balance: %.2f\n", balance);
         printf("\n***** Current Balance *****\n");
         printf("\nAccount number:- %s\n", accountNumber);
         printf("Your current balance is:- %.2f\n", balance);
@@ -171,4 +183,8 @@ float convertToFloat(char input[]) {
         i++;
     }
     return result;
+}
+
+int validateTaskNumber(int task) {
+    return task >= 0 && task <= 5;
 }
